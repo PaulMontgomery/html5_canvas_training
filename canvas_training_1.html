@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>HTML5 Canvas Training Course 1</title>
+
+        <script src="http://code.createjs.com/createjs-2013.12.12.min.js"></script>
+
+        <script>
+            // Draws an animated bouncing circle on the canvas
+            // Paul Montgomery (paulmontgomery.code@gmail.com) 2014/05/09
+            // Descriptions and explanations are at:
+            // http://paulmontgomerycode.wordpress.com/2014/05/09/html5-canvas-training-course-1/
+
+            var stage, canvas_width, canvas_height, circle_shape, circle_radius = 50;
+
+
+            function demo_preinit() {
+                console.log("demo_preinit() called");
+                demo_canvas = document.getElementById("demo_canvas");
+                canvas_width = demo_canvas.width;
+                canvas_height = demo_canvas.height;
+                console.log("demo_canvas is " + canvas_width + " by " +
+                    canvas_height + " pixels in size");
+                demo_canvas.oncontextmenu = function(e) {
+                    e.preventDefault();
+                }
+
+                stage = new createjs.Stage(demo_canvas);
+
+                demo_init();
+            }
+
+
+            function demo_init() {
+                console.log("demo_init() called");
+                var graphics = new createjs.Graphics();
+                graphics.beginFill("#BB00BB");
+                graphics.drawCircle(0, 0, circle_radius);
+                circle_shape = new createjs.Shape(graphics);
+                circle_shape.moving_right = true;
+                circle_shape.x = canvas_width / 2;
+                circle_shape.y = canvas_height / 2;
+                stage.addChild(circle_shape);
+
+                createjs.Ticker.setFPS(30);
+                createjs.Ticker.addEventListener("tick", demo_tick);
+                console.log("Starting animated circle...");
+            }
+
+
+            function demo_tick() {
+                if (circle_shape.moving_right == true) {
+                    circle_shape.x += 5;
+                    if (circle_shape.x >= (canvas_width - circle_radius))
+                        circle_shape.moving_right = false;
+                } else {
+                    circle_shape.x -= 5;
+                    if (circle_shape.x <= circle_radius)
+                        circle_shape.moving_right = true;
+                }
+
+                stage.update();
+            }
+        </script>
+    </head>
+
+    <body onload="demo_preinit();">
+        <h1>HTML5 Canvas Training Course 1</h1>
+        <canvas id="demo_canvas" width="500" height="300" style="background-color:#EEEEEE">
+            <p>Your browser does not support HTML5 Canvas which is required to see this content.</p>
+        </canvas>
+    </body>
+</html>
