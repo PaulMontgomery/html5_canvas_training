@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>HTML5 Canvas Training Course 2: Mouse Interactions</title>
+
+        <script src="http://code.createjs.com/createjs-2013.12.12.min.js">
+        </script>
+
+        <script>
+            // Draggable objects and mouse interactions
+            // Paul Montgomery (paulmontgomery.code@gmail.com) 2014/05/14
+            // Descriptions and explanations are at:
+            // http://paulmontgomerycode.wordpress.com/2014/05/14/html5-canvas-training-course-2/
+
+            var stage, canvas_width, canvas_height, circle_shape,
+                circle_radius = 50;
+
+
+            function demo_preinit() {
+                console.log("demo_preinit() called");
+                demo_canvas = document.getElementById("demo_canvas");
+                canvas_width = demo_canvas.width;
+                canvas_height = demo_canvas.height;
+                console.log("demo_canvas is " + canvas_width + " by " +
+                    canvas_height + " pixels in size");
+                demo_canvas.oncontextmenu = function(e) {
+                    e.preventDefault();
+                }
+
+                stage = new createjs.Stage(demo_canvas);
+
+                /* Example: Loading multiple external resources like images
+                queue = new createjs.LoadQueue(false);
+                queue.addEventListener("complete", demo_init);
+                queue.loadManifest([
+                    {id:"image_name1", src:"images/image1.png},
+                    {id:"image_name2", src:"images/image2.png}
+                    ]);
+                */
+                demo_init();
+            }
+
+
+            function demo_init() {
+                console.log("demo_init() called");
+
+                create_draggable_object(canvas_width * 0.25,
+                    canvas_height / 2, "#BB00BB");
+                create_draggable_object(canvas_width * 0.75,
+                    canvas_height / 2, "#00BBBB");
+
+                createjs.Ticker.setFPS(30);
+                createjs.Ticker.addEventListener("tick", demo_tick);
+            }
+
+
+            function demo_tick() {
+                stage.update();
+            }
+
+
+            function create_draggable_object(start_x, start_y, color) {
+                /* Example of using a preloaded image
+                var image1 = new createjs.Bitmap(
+                    queue.getResult("image_name1"));
+                */
+
+                var graphics = new createjs.Graphics();
+                graphics.beginFill(color);
+                graphics.drawCircle(0, 0, circle_radius);
+                circle_shape = new createjs.Shape(graphics);
+
+                var dragger = new createjs.Container();
+                dragger.x = start_x;
+                dragger.y = start_y;
+                dragger.alpha = 0.5;
+                dragger.addChild(circle_shape);
+
+                dragger.on("pressmove", function(evt) {
+                    evt.currentTarget.x = evt.stageX;
+                    evt.currentTarget.y = evt.stageY;
+                });
+
+                dragger.addEventListener("mousedown", function(evnt) {
+                    if (evnt.nativeEvent.button == 2) { // right mouse button
+                        console.log("Right click down on object id: " +
+                            evnt.currentTarget.id);
+                        createjs.Tween.get(evnt.currentTarget)
+                            .to({alpha:0.10}, 2000)
+                            .to({alpha:1}, 2000)
+                            .to({alpha:0.5}, 1000);
+                    } else {
+                        console.log("Left click down on object id: " +
+                            evnt.currentTarget.id);
+                    }
+                    evnt.addEventListener("mouseup", function(evt) {
+                        console.log("Mouse up on object id: " +
+                            evnt.currentTarget.id);
+                    });
+                });
+
+                stage.addChild(dragger);
+                console.log("Created draggable shape with id: " + dragger.id);
+            }
+        </script>
+    </head>
+
+    <body onload="demo_preinit();">
+        <h1>HTML5 Canvas Training Course 2: Mouse Interactions</h1>
+        <canvas id="demo_canvas" width="500" height="300" 
+            style="background-color:#EEEEEE">
+            <p>Your browser does not support HTML5 Canvas which is required
+            to see this content.</p>
+        </canvas>
+    </body>
+</html>
